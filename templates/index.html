@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Employee Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Employee Analytics (from /api/analytics/summary/)</h1>
+  <div>
+    <canvas id="deptChart" width="600" height="300"></canvas>
+  </div>
+  <div>
+    <canvas id="perfChart" width="600" height="300"></canvas>
+  </div>
+
+  <script>
+    async function draw(){
+      const res = await fetch('/api/analytics/summary/');
+      const data = await res.json();
+
+      // ✅ Convert dictionary to arrays
+      const deptLabels = Object.keys(data.employees_by_department);
+      const deptCounts = Object.values(data.employees_by_department);
+
+      new Chart(document.getElementById('deptChart'), {
+        type: 'bar',
+        data: { 
+          labels: deptLabels, 
+          datasets: [{ 
+            label: 'Employees by Department', 
+            data: deptCounts,
+            backgroundColor: "rgba(75, 192, 192, 0.6)"
+          }] 
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      // ✅ Performance distribution
+      const perfLabels = Object.keys(data.performance_distribution);
+      const perfCounts = Object.values(data.performance_distribution);
+
+      new Chart(document.getElementById('perfChart'), {
+        type: 'pie',
+        data: { 
+          labels: perfLabels, 
+          datasets: [{ 
+            label: 'Performance distribution', 
+            data: perfCounts,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.6)",
+              "rgba(54, 162, 235, 0.6)",
+              "rgba(255, 206, 86, 0.6)",
+              "rgba(75, 192, 192, 0.6)",
+              "rgba(153, 102, 255, 0.6)"
+            ]
+          }] 
+        },
+        options: { responsive: true }
+      });
+    }
+    draw();
+  </script>
+</body>
+</html>
